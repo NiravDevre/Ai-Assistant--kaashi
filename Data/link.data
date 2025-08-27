@@ -1,0 +1,13 @@
+APP_WEBSITES = {
+    "youtube": "https://www.youtube.com",
+    "spotify": "https://www.spotify.com",
+    "facebook": "https://www.facebook.com",
+    "twitter": "https://twitter.com",
+    "gmail": "https://mail.google.com",
+    "instagram": "https://www.instagram.com",
+    "reddit": "https://www.reddit.com",
+    "netflix": "https://www.netflix.com",
+    "zoom": "https://zoom.us",
+    "discord": "https://discord.com",
+    # add more as needed
+}

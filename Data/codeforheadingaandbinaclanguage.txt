@@ -1,0 +1,50 @@
+Here is a simple C program that takes two numbers as input and outputs the corresponding river name:
+```c
+#include <stdio.h>
+
+int main() {
+    int a, b;
+    printf("Enter number for River A: ");
+    scanf("%d", &a);
+    printf("Enter number for River B: ");
+    scanf("%d", &b);
+
+    switch(a) {
+        case 1:
+            printf("River A: Ganga\n");
+            break;
+        case 2:
+            printf("River A: Yamuna\n");
+            break;
+        case 3:
+            printf("River A: Brahmaputra\n");
+            break;
+        default:
+            printf("Invalid input for River A\n");
+    }
+
+    switch(b) {
+        case 1:
+            printf("River B: Narmada\n");
+            break;
+        case 2:
+            printf("River B: Tapi\n");
+            break;
+        case 3:
+            printf("River B: Godavari\n");
+            break;
+        default:
+            printf("Invalid input for River B\n");
+    }
+
+    return 0;
+}
+```
+Here's how the program works:
+
+1. The program prompts the user to enter a number for River A and River B.
+2. The `scanf` function is used to read the input numbers.
+3. The `switch` statement is used to match the input numbers with the corresponding river names.
+4. If the input number is valid, the program outputs the corresponding river name. Otherwise, it outputs an error message.
+
+Note that this is a simple example, and you can add more cases to the `switch` statement to include more river names.

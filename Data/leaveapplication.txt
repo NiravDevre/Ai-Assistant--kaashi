@@ -1,0 +1,42 @@
+Here is a sample leave application:
+
+**Leave Application**
+
+**Employee Details:**
+
+* Name: _____________________________________
+* Employee ID: __________________________________
+* Department: ___________________________________
+
+**Leave Details:**
+
+* Type of Leave: _______________________________ (e.g., Annual Leave, Sick Leave, Family Emergency Leave, etc.)
+* Dates of Leave: From ________________________ to _______________________
+* Number of Days: ______________________________
+
+**Reason for Leave:**
+
+* Please briefly explain the reason for your leave: _______________________________________________________
+
+**Work Arrangements:**
+
+* I have made arrangements to complete all my tasks and ensure a smooth transition of work during my absence.
+* I will be available by email if anything urgent comes up while I am away.
+
+**Declaration:**
+
+* I hereby declare that the information provided is true and accurate.
+* I understand that my leave is subject to approval by my supervisor/manager.
+
+**Signature:**
+
+* Signature: ______________________________________
+* Date: _______________________________________
+
+**Supervisor/Manager's Approval:**
+
+* Approved: ______________________________________
+* Date: _______________________________________
+* Remarks: _______________________________________
+
+Note: This is a sample format, and the actual leave application form may vary depending on the company's policies and requirements.

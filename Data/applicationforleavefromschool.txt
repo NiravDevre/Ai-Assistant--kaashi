@@ -1,0 +1,23 @@
+Here is a sample application for leave from school:
+
+[Your Name]
+[Your Class/Grade]
+[Your Roll Number]
+[Date]
+
+Respected [Teacher's Name/Principal's Name],
+
+I am writing to request a leave of absence from school for [number] days, starting from [start date] to [end date].
+
+The reason for my absence is [state the reason for leave, e.g. personal reasons, family function, illness, etc.]. I apologize for any inconvenience this may cause and will make sure to catch up on any missed work as soon as possible.
+
+I would be grateful if you could grant me permission for this leave. Please let me know if there are any issues or if you need any further information from me.
+
+Thank you for your understanding and support.
+
+Sincerely,
+
+[Your Signature]
+[Your Name]
+
+Please note that this is a sample and you should customize it according to your specific situation and needs. Also, make sure to get the application signed by your parent/guardian if required by your school.
