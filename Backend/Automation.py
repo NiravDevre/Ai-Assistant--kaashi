@@ -1,5 +1,5 @@
-# Import required libraries
-from AppOpener import close, open as appopen  # Import functions to open and close apps.
+# # Import required libraries
+# from AppOpener import close, open as appopen  # Import functions to open and close apps.
 from webbrowser import open as webopen  # Import web browser functionality.
 from pywhatkit import search, playonyt  # Import functions for Google search and YouTube playback.
 from dotenv import dotenv_values  # Import dotenv to manage environment variables.
@@ -169,51 +169,51 @@ APP_WEBSITES = {
 }
 
 
-def OpenApp(app, sess=requests.session()):
-    try:
-        appopen(app, match_closest=True, output=True, throw_error=True)
-        return True
+# def OpenApp(app, sess=requests.session()):
+#     try:
+#         appopen(app, match_closest=True, output=True, throw_error=True)
+#         return True
 
-    except Exception as e:
-        print(f"Could not open app directly: {e}")
+#     except Exception as e:
+#         print(f"Could not open app directly: {e}")
 
-        app_lower = app.lower()
-        if app_lower in APP_WEBSITES:
-            url = APP_WEBSITES[app_lower]
-            print(f"Opening official website for {app}: {url}")
-            webbrowser.open(url)
-            return True
+#         app_lower = app.lower()
+#         if app_lower in APP_WEBSITES:
+#             url = APP_WEBSITES[app_lower]
+#             print(f"Opening official website for {app}: {url}")
+#             webbrowser.open(url)
+#             return True
 
-        # If not found, do a Google search and open the first relevant result
-        headers = {"User-Agent": "Mozilla/5.0"}
-        search_url = f"https://www.google.com/search?q={urllib.parse.quote(app)}"
-        response = sess.get(search_url, headers=headers)
-        soup = BeautifulSoup(response.text, "html.parser")
+#         # If not found, do a Google search and open the first relevant result
+#         headers = {"User-Agent": "Mozilla/5.0"}
+#         search_url = f"https://www.google.com/search?q={urllib.parse.quote(app)}"
+#         response = sess.get(search_url, headers=headers)
+#         soup = BeautifulSoup(response.text, "html.parser")
 
-        for a in soup.find_all("a", href=True):
-            href = a['href']
-            if href.startswith("/url?q="):
-                url = href.split("/url?q=")[1].split("&")[0]
-                url = urllib.parse.unquote(url)
-                # Open the first valid URL (skip google internal links)
-                if not url.startswith("https://webcache.googleusercontent.com") and not url.startswith("https://policies.google.com"):
-                    print(f"Opening first search result URL: {url}")
-                    webbrowser.open(url)
-                    return True
+#         for a in soup.find_all("a", href=True):
+#             href = a['href']
+#             if href.startswith("/url?q="):
+#                 url = href.split("/url?q=")[1].split("&")[0]
+#                 url = urllib.parse.unquote(url)
+#                 # Open the first valid URL (skip google internal links)
+#                 if not url.startswith("https://webcache.googleusercontent.com") and not url.startswith("https://policies.google.com"):
+#                     print(f"Opening first search result URL: {url}")
+#                     webbrowser.open(url)
+#                     return True
 
-        print(f"No suitable URL found for {app}")
-        return False
+#         print(f"No suitable URL found for {app}")
+#         return False
 
-# Function to close an application.
-def CloseApp(app):
-    if "chrome" in app:
-        pass  # Skip if the app is Chrome.
-    else:
-        try:
-            close(app, match_closest=True, output=True, throw_error=True)  # Attempt to close the app.
-            return True  # Indicate success.
-        except:
-            return False
+# # Function to close an application.
+# def CloseApp(app):
+#     if "chrome" in app:
+#         pass  # Skip if the app is Chrome.
+#     else:
+#         try:
+#             close(app, match_closest=True, output=True, throw_error=True)  # Attempt to close the app.
+#             return True  # Indicate success.
+#         except:
+#             return False
 
 # Function to execute system-level commands.
 def System(command):
