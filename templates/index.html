@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kashi AI - Your Intelligent Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2a2a2a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #cccccc;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .login-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #666666, #444444);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #777777, #555555);
+            box-shadow: 0 5px 20px rgba(102, 102, 102, 0.4);
+        }
+
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .skip-login {
+            text-align: center;
+            margin-top: 20px;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .skip-login:hover {
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #ffffff, #cccccc, #ffffff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            height: fit-content;
+            align-items: start;
+        }
+
+        .chat-section {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            max-height: 420px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #555555, #333333);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .ai-message {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f0f0f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message-sender {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .message-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #888888;
+            box-shadow: 0 0 20px rgba(136, 136, 136, 0.3);
+        }
+
+        .message-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .send-btn, .voice-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #666666, #444444);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .send-btn:hover, .voice-btn:hover {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, #777777, #555555);
+            box-shadow: 0 5px 20px rgba(102, 102, 102, 0.4);
+        }
+
+        .voice-btn.recording {
+            background: linear-gradient(135deg, #666666, #444444);
+            animation: pulse 1s infinite;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 530px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .sidebar-container{
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 5px;
+            padding: 10px;
+            max-height: 480px;
+        }
+        ::-webkit-scrollbar {
+            width: 15px;
+        }
+
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #333;
+            border: none;
+            border-radius: 7px;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+            border: none;
+            border-radius: 7px;
+        }
+
+        .status-section {
+            margin-bottom: 30px;
+        }
+
+        .status-section h3 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4caf50;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .premium-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .premium-section h3 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .premium-section p {
+            color: #cccccc;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 10px 0;
+        }
+
+        .premium-features {
+            text-align: left;
+            margin: 15px 0;
+        }
+
+        .premium-features li {
+            color: #cccccc;
+            margin: 5px 0;
+            font-size: 0.85rem;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #555555, #333333);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, #666666, #444444);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(85, 85, 85, 0.4);
+        }
+
+        .controls-section {
+            margin-bottom: 30px;
+        }
+
+        .controls-section h3 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .control-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .features-section h3 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #888888;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(136, 136, 136, 0.3);
+            border-top-color: #888888;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(255, 75, 87, 0.2);
+            border: 1px solid #ff4757;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            color: #ff4757;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .sidebar {
+                position: relative;
+                top: 0;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-form">
+            <h2>Welcome to Kashi AI</h2>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password">
+            </div>
+            <div class="form-group" id="usernameGroup" style="display: none;">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Choose a username">
+            </div>
+            <div class="login-buttons">
+                <button class="btn" id="loginBtn">Login</button>
+                <button class="btn secondary" id="signupBtn">Sign Up</button>
+            </div>
+            <div class="skip-login" onclick="skipLogin()">Continue as Guest</div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <div class="user-info">
+            <span id="userDisplay">Guest User</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="container">
+            <div class="header">
+                <h1>Kashi AI</h1>
+                <p>Your Intelligent Assistant</p>
+            </div>
+
+            <div class="main-content">
+                <div class="chat-section">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai-message">
+                            <div class="message-sender">Kashi AI</div>
+                            <div>Hello! I'm Kashi AI, your intelligent assistant. I can help you with:</div>
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>Answering questions and general conversation</li>
+                                <li>Real-time web search and information</li>
+                                <li>Setting reminders and managing tasks</li>
+                                <li>Voice interaction and text-to-speech</li>
+                            </ul>
+                            <div style="margin-top: 10px;">How can I help you today?</div>
+                        </div>
+                    </div>
+
+                    <div class="input-section">
+                        <input type="text" class="message-input" id="messageInput" placeholder="Type your message here..." maxlength="500">
+                        <button class="voice-btn" id="voiceBtn" title="Voice Input">🎤</button>
+                        <button class="send-btn" id="sendBtn" title="Send Message">▶</button>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="sidebar-container">
+                    <div class="status-section">
+                        <h3>Status</h3>
+                        <div class="status-indicator">
+                            <div class="status-dot" id="statusDot"></div>
+                            <span id="statusText">Ready to help</span>
+                        </div>
+                    </div>
+
+                    <!-- Premium Section (Only for logged-in users) -->
+                    <div class="premium-section" id="premiumSection" style="display: none;">
+                        <h3>🔥 Premium Features</h3>
+                        <p>Upgrade to get the full Kashi AI desktop application with advanced features!</p>
+                        <div class="price-tag">₹1,000</div>
+                        <ul class="premium-features">
+                            <li>✓ AI Image Generation</li>
+                            <li>✓ File Upload & Analysis</li>
+                            <li>✓ Advanced Voice Features</li>
+                            <li>✓ Offline Mode</li>
+                            <li>✓ Priority Support</li>
+                            <li>✓ No Usage Limits</li>
+                            <li>✓ Custom Integrations</li>
+                        </ul>
+                        <button class="download-btn" onclick="purchaseApp()">Buy & Download App</button>
+                    </div>
+
+                    <div class="controls-section">
+                        <h3>Quick Actions</h3>
+                        <!-- <button class="control-btn" onclick="clearChat()">Clear Chat</button>
+                        <button class="control-btn" onclick="loadChatHistory()">Load History</button>
+                        <button class="control-btn" onclick="downloadChat()">Download Chat</button> -->
+                        <button class="control-btn" onclick="showHelp()">Help & Commands</button>
+                    </div>
+
+                    <div class="features-section">
+                        <h3>Features</h3>
+                        <div class="feature-item">
+                            <span class="feature-icon">🧠</span>
+                            <span>AI Conversation</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🔍</span>
+                            <span>Real-time Search</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🎤</span>
+                            <span>Voice Input</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🔧</span>
+                            <span>Task Automation</span>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // Configuration
+        const API_BASE = window.location.origin;
+        let currentUser = {
+            id: 'guest_' + Date.now(),
+            username: 'Guest User',
+            isAuthenticated: false
+        };
+
+        // Audio context for TTS
+        let audioContext = null;
+        let currentAudio = null;
+        let synth = window.speechSynthesis;
+
+        class KashiAIWebApp {
+            constructor() {
+                this.isRecording = false;
+                this.recognition = null;
+                this.isProcessing = false;
+                this.initializeElements();
+                this.setupEventListeners();
+                this.initializeSpeechRecognition();
+                this.initializeTextToSpeech();
+                this.checkLoginStatus();
+            }
+
+            initializeElements() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.voiceBtn = document.getElementById('voiceBtn');
+                this.statusText = document.getElementById('statusText');
+                this.statusDot = document.getElementById('statusDot');
+                this.loginModal = document.getElementById('loginModal');
+                this.mainApp = document.getElementById('mainApp');
+                this.userDisplay = document.getElementById('userDisplay');
+                this.premiumSection = document.getElementById('premiumSection');
+                
+                // Login elements
+                this.emailInput = document.getElementById('email');
+                this.passwordInput = document.getElementById('password');
+                this.usernameInput = document.getElementById('username');
+                this.loginBtn = document.getElementById('loginBtn');
+                this.signupBtn = document.getElementById('signupBtn');
+                this.usernameGroup = document.getElementById('usernameGroup');
+            }
+
+            setupEventListeners() {
+                // Chat functionality
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !this.isProcessing) this.sendMessage();
+                });
+                this.voiceBtn.addEventListener('click', () => this.toggleVoiceRecording());
+
+                // Login functionality
+                this.loginBtn.addEventListener('click', () => this.handleLogin());
+                this.signupBtn.addEventListener('click', () => this.toggleSignupMode());
+                this.passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.handleLogin();
+                });
+            }
+
+            initializeTextToSpeech() {
+                // Initialize Web Audio API for better TTS
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (error) {
+                    console.warn('Web Audio API not supported, falling back to Speech Synthesis API');
+                }
+            }
+
+            speakText(text) {
+                // Stop any current speech
+                if (synth.speaking) {
+                    synth.cancel();
+                }
+
+                if (!text || text.trim() === '') return;
+
+                try {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    // Configure voice settings
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    utterance.volume = 0.8;
+                    
+                    // Try to use a better voice
+                    const voices = synth.getVoices();
+                    const preferredVoice = voices.find(voice => 
+                        voice.name.includes('Neural') || 
+                        voice.name.includes('Premium') || 
+                        voice.name.includes('Enhanced')
+                    ) || voices.find(voice => voice.lang.startsWith('en')) || voices[0];
+                    
+                    if (preferredVoice) {
+                        utterance.voice = preferredVoice;
+                    }
+
+                    // Add event listeners
+                    utterance.onstart = () => {
+                        this.updateStatus('Speaking...', 'speaking');
+                    };
+
+                    utterance.onend = () => {
+                        this.updateStatus('Ready to help', 'ready');
+                    };
+
+                    utterance.onerror = (event) => {
+                        console.error('Speech synthesis error:', event);
+                        this.updateStatus('Speech error', 'error');
+                    };
+
+                    // Speak the text
+                    synth.speak(utterance);
+                    
+                } catch (error) {
+                    console.error('Text-to-speech error:', error);
+                    this.updateStatus('Speech unavailable', 'error');
+                }
+            }
+
+            checkLoginStatus() {
+                const savedUser = localStorage.getItem('kashiAI_user');
+                if (savedUser) {
+                    try {
+                        currentUser = JSON.parse(savedUser);
+                        this.showMainApp();
+                    } catch (e) {
+                        console.error('Error parsing saved user data:', e);
+                        this.showLoginModal();
+                    }
+                } else {
+                    this.showLoginModal();
+                }
+            }
+
+            showLoginModal() {
+                this.loginModal.classList.remove('hidden');
+                this.mainApp.classList.add('hidden');
+            }
+
+            showMainApp() {
+                this.loginModal.classList.add('hidden');
+                this.mainApp.classList.remove('hidden');
+                this.userDisplay.textContent = currentUser.username;
+                
+                // Show premium section only for authenticated users
+                if (currentUser.isAuthenticated) {
+                    this.premiumSection.style.display = 'block';
+                }
+                
+                this.loadChatHistory();
+            }
+
+            toggleSignupMode() {
+                const isSignup = this.usernameGroup.style.display === 'none';
+                this.usernameGroup.style.display = isSignup ? 'block' : 'none';
+                this.loginBtn.textContent = isSignup ? 'Sign Up' : 'Login';
+                this.signupBtn.textContent = isSignup ? 'Switch to Login' : 'Switch to Sign Up';
+            }
+
+            async handleLogin() {
+                const email = this.emailInput.value.trim();
+                const password = this.passwordInput.value.trim();
+                const username = this.usernameInput.value.trim();
+                const isSignup = this.usernameGroup.style.display !== 'none';
+
+                if (!email || !password || (isSignup && !username)) {
+                    this.showError('Please fill in all required fields');
+                    return;
+                }
+
+                const endpoint = isSignup ? '/api/auth/signup' : '/api/auth/login';
+                const payload = { email, password };
+                if (isSignup) payload.username = username;
+
+                try {
+                    const response = await fetch(API_BASE + endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        currentUser = {
+                            id: data.user_id,
+                            username: data.username,
+                            token: data.token,
+                            isAuthenticated: true
+                        };
+                        
+                        localStorage.setItem('kashiAI_user', JSON.stringify(currentUser));
+                        this.showMainApp();
+                    } else {
+                        this.showError(data.error || 'Authentication failed');
+                    }
+                } catch (error) {
+                    console.error('Auth error:', error);
+                    this.showError('Connection error. Please try again.');
+                }
+            }
+
+            showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                
+                const form = document.querySelector('.login-form');
+                const existing = form.querySelector('.error-message');
+                if (existing) existing.remove();
+                
+                form.appendChild(errorDiv);
+                setTimeout(() => errorDiv.remove(), 5000);
+            }
+
+
+
+            initializeSpeechRecognition() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    this.recognition.lang = 'en-US';
+
+                    this.recognition.onstart = () => {
+                        this.isRecording = true;
+                        this.voiceBtn.classList.add('recording');
+                        this.updateStatus('Listening...', 'recording');
+                    };
+
+                    this.recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        this.messageInput.value = transcript;
+                        this.sendMessage();
+                    };
+
+                    this.recognition.onend = () => {
+                        this.isRecording = false;
+                        this.voiceBtn.classList.remove('recording');
+                        if (!this.isProcessing) {
+                            this.updateStatus('Ready to help', 'ready');
+                        }
+                    };
+
+                    this.recognition.onerror = (event) => {
+                        console.error('Speech recognition error:', event.error);
+                        this.isRecording = false;
+                        this.voiceBtn.classList.remove('recording');
+                        this.updateStatus('Speech error', 'error');
+                    };
+                }
+            }
+
+            toggleVoiceRecording() {
+                if (!this.recognition) {
+                    alert('Speech recognition is not supported in your browser.');
+                    return;
+                }
+
+                if (this.isRecording) {
+                    this.recognition.stop();
+                } else {
+                    this.recognition.start();
+                }
+            }
+
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message || this.isProcessing) return;
+
+                this.isProcessing = true;
+                this.sendBtn.disabled = true;
+                this.addMessage(message, 'user');
+                this.messageInput.value = '';
+                this.updateStatus('Processing...', 'processing');
+
+                try {
+                    const response = await fetch(API_BASE + '/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: message,
+                            user_id: currentUser.id
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        this.addMessage(`Error: ${data.error}`, 'ai', 'error');
+                    } else {
+                        this.addMessage(data.response, 'ai');
+                        
+                        // Enable TTS for AI responses
+                        this.speakText(data.response);
+                        
+                        // Handle special data like images
+                        if (data.data && data.data.images) {
+                            data.data.images.forEach(img => {
+                                if (img.type === 'image' && img.data) {
+                                    this.addImageMessage(img.data, img.prompt);
+                                }
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Chat error:', error);
+                    const errorMsg = 'Connection error. Please try again.';
+                    this.addMessage(errorMsg, 'ai', 'error');
+                    this.speakText(errorMsg);
+                } finally {
+                    this.isProcessing = false;
+                    this.sendBtn.disabled = false;
+                    this.updateStatus('Ready to help', 'ready');
+                }
+            }
+
+            async handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('user_id', currentUser.id);
+                formData.append('question', 'What can you tell me about this file?');
+
+                this.updateStatus('Uploading file...', 'processing');
+
+                try {
+                    const response = await fetch(API_BASE + '/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        const errorMsg = `Upload error: ${data.error}`;
+                        this.addMessage(errorMsg, 'ai', 'error');
+                    } else {
+                        this.addMessage(data.response, 'ai');
+                        this.speakText(data.response);
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    const errorMsg = 'File upload failed. Please try again.';
+                    this.addMessage(errorMsg, 'ai', 'error');
+                } finally {
+                    this.updateStatus('Ready to help', 'ready');
+                    event.target.value = '';
+                }
+            }
+
+            addMessage(message, sender, type = '') {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+                if (type === 'error') messageDiv.style.borderLeft = '4px solid #ff4757';
+                
+                const senderName = sender === 'user' ? currentUser.username : 'Kashi AI';
+                messageDiv.innerHTML = `
+                    <div class="message-sender">${senderName}</div>
+                    <div>${this.formatMessage(message)}</div>
+                `;
+
+                this.chatMessages.appendChild(messageDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+
+            formatMessage(message) {
+                // Basic markdown-like formatting
+                return message
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+            }
+
+            addImageMessage(imageData, prompt) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message ai-message';
+                messageDiv.innerHTML = `
+                    <div class="message-sender">Kashi AI</div>
+                    <div>Generated image for: "${prompt}"</div>
+                    <img src="${imageData}" class="image-preview" alt="Generated image" onclick="this.style.maxHeight = this.style.maxHeight === 'none' ? '300px' : 'none'">
+                `;
+                this.chatMessages.appendChild(messageDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+
+            updateStatus(text, type = 'ready') {
+                if (this.statusText) this.statusText.textContent = text;
+                
+                const colors = {
+                    ready: '#4caf50',
+                    processing: '#ff9800', 
+                    recording: '#f44336',
+                    speaking: '#2196f3',
+                    error: '#f44336'
+                };
+                
+                if (this.statusDot) {
+                    this.statusDot.style.backgroundColor = colors[type] || colors.ready;
+                }
+            }
+
+            async loadChatHistory() {
+                try {
+                    const response = await fetch(`${API_BASE}/api/chat/history/${currentUser.id}`);
+                    const data = await response.json();
+                    
+                    if (data.history && data.history.length > 0) {
+                        // Clear current messages except welcome
+                        this.chatMessages.innerHTML = `
+                            <div class="message ai-message">
+                                <div class="message-sender">Kashi AI</div>
+                                <div>Chat history loaded. How can I help you today?</div>
+                            </div>
+                        `;
+                        
+                        // Add historical messages
+                        data.history.slice(-10).forEach(msg => { // Only show last 10 messages
+                            this.addMessage(msg.content, msg.role);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error loading chat history:', error);
+                }
+            }
+        }
+
+        // Global functions for sidebar controls
+        async function clearChat() {
+            try {
+                await fetch(`${API_BASE}/api/chat/clear/${currentUser.id}`, {
+                    method: 'POST'
+                });
+                
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.innerHTML = `
+                    <div class="message ai-message">
+                        <div class="message-sender">Kashi AI</div>
+                        <div>Chat cleared! How can I help you?</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error clearing chat:', error);
+            }
+        }
+
+        function logout() {
+            // Stop any ongoing speech
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+            
+            localStorage.removeItem('kashiAI_user');
+            currentUser = {
+                id: 'guest_' + Date.now(),
+                username: 'Guest User',
+                isAuthenticated: false
+            };
+            window.kashiAI.showLoginModal();
+        }
+
+        function skipLogin() {
+            window.kashiAI.showMainApp();
+        }
+
+        async function loadChatHistory() {
+            await window.kashiAI.loadChatHistory();
+        }
+
+        function downloadChat() {
+            const chatMessages = document.getElementById('chatMessages');
+            const messages = Array.from(chatMessages.querySelectorAll('.message')).map(msg => {
+                const sender = msg.querySelector('.message-sender').textContent;
+                const content = msg.querySelector('div:last-child').textContent;
+                return `${sender}: ${content}`;
+            }).join('\n\n');
+            
+            const blob = new Blob([messages], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `kashi-ai-chat-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Replace the existing purchaseApp() function in your index.html
+
+        async function purchaseApp() {
+            if (!currentUser.isAuthenticated) {
+                alert("Please login to purchase premium features!");
+                return;
+            }
+
+            // Show loading state
+            const premiumSection = document.getElementById("premiumSection");
+            const originalContent = premiumSection.innerHTML;
+            premiumSection.innerHTML = `
+                <div class="loading" style="text-align: center; padding: 20px;">
+                    <h3>Processing Payment...</h3>
+                    <p>Please wait while we prepare your payment</p>
+                </div>
+            `;
+
+            try {
+                // Create order from backend
+                const response = await fetch(`${API_BASE}/api/create-order`, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${currentUser.token || ''}`
+                    },
+                    body: JSON.stringify({ 
+                        user_id: currentUser.id,
+                        username: currentUser.username,
+                        amount: 100000 // ₹1000 in paise
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const order = await response.json();
+                
+                if (order.error) {
+                    throw new Error(order.error);
+                }
+
+                // Initialize Razorpay payment
+                const options = {
+                    "key": "rzp_test_9WkHQWnVEfRzPq", // Replace with your actual Razorpay key
+                    "amount": order.amount,
+                    "currency": "INR",
+                    "name": "Kashi AI",
+                    "description": "Premium App License - Lifetime Access",
+                    "image": "/static/logo.png", // Add your logo
+                    "order_id": order.id,
+                    "handler": async function (response) {
+                        // Payment successful - verify on backend
+                        try {
+                            const verifyResponse = await fetch(`${API_BASE}/api/payment/verify`, {
+                                method: "POST",
+                                headers: { 
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${currentUser.token || ''}`
+                                },
+                                body: JSON.stringify({
+                                    user_id: currentUser.id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature
+                                })
+                            });
+
+                            const verifyResult = await verifyResponse.json();
+                            
+                            if (verifyResult.success) {
+                                // Payment verified successfully
+                                premiumSection.innerHTML = `
+                                    <div style="text-align: center; padding: 20px;">
+                                        <h3 style="color: #4CAF50;">✅ Payment Successful!</h3>
+                                        <p>Thank you for purchasing Kashi AI Premium!</p>
+                                        <p><strong>Transaction ID:</strong> ${response.razorpay_payment_id}</p>
+                                        <div style="margin: 20px 0;">
+                                            <a href="${verifyResult.download_link || '#'}" 
+                                            class="download-btn" 
+                                            onclick="downloadApp(event)"
+                                            style="display: inline-block; margin: 10px 0;">
+                                                🚀 Download Kashi AI Desktop
+                                            </a>
+                                        </div>
+                                        <p style="font-size: 0.9em; color: #aaa;">
+                                            Check your email for download instructions and license key.
+                                        </p>
+                                    </div>
+                                `;
+
+                                // Show success message
+                                window.kashiAI.addMessage("🎉 Premium purchase successful! You now have access to all premium features.", 'ai');
+                                
+                                // Update user status
+                                currentUser.isPremium = true;
+                                localStorage.setItem('kashiAI_user', JSON.stringify(currentUser));
+
+                            } else {
+                                throw new Error(verifyResult.error || 'Payment verification failed');
+                            }
+
+                        } catch (error) {
+                            console.error('Payment verification error:', error);
+                            premiumSection.innerHTML = `
+                                <div class="error-message" style="text-align: center;">
+                                    <h3>❌ Verification Failed</h3>
+                                    <p>Payment completed but verification failed. Please contact support.</p>
+                                    <p><strong>Payment ID:</strong> ${response.razorpay_payment_id}</p>
+                                    <button class="download-btn" onclick="contactSupport('${response.razorpay_payment_id}')">
+                                        Contact Support
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    },
+                    "prefill": {
+                        "name": currentUser.username,
+                        "email": currentUser.email || "",
+                        "contact": currentUser.phone || ""
+                    },
+                    "notes": {
+                        "user_id": currentUser.id,
+                        "username": currentUser.username,
+                        "product": "Kashi AI Premium"
+                    },
+                    "theme": {
+                        "color": "#666666"
+                    },
+                    "modal": {
+                        "ondismiss": function() {
+                            // User closed payment modal
+                            premiumSection.innerHTML = originalContent;
+                            window.kashiAI.addMessage("Payment cancelled. You can try again anytime!", 'ai');
+                        }
+                    }
+                };
+
+                // Open Razorpay payment gateway
+                const rzp = new Razorpay(options);
+                
+                rzp.on('payment.failed', function (response) {
+                    console.error('Payment failed:', response.error);
+                    premiumSection.innerHTML = originalContent;
+                    
+                    const errorMessage = response.error.description || 'Payment failed. Please try again.';
+                    window.kashiAI.addMessage(`Payment failed: ${errorMessage}`, 'ai', 'error');
+                    
+                    // Show user-friendly error
+                    alert(`Payment Failed\n\nReason: ${response.error.reason}\nDescription: ${errorMessage}`);
+                });
+
+                rzp.open();
+
+            } catch (error) {
+                console.error("Payment initialization error:", error);
+                premiumSection.innerHTML = originalContent;
+                
+                const errorMessage = error.message || 'Failed to initialize payment. Please try again.';
+                window.kashiAI.addMessage(`Payment error: ${errorMessage}`, 'ai', 'error');
+                
+                alert(`Payment Error: ${errorMessage}`);
+            }
+        }
+
+        // Helper function for download
+        function downloadApp(event) {
+            event.preventDefault();
+            
+            // Track download
+            fetch(`${API_BASE}/api/track-download`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    user_id: currentUser.id,
+                    action: "premium_download"
+                })
+            }).catch(console.error);
+            
+            // Trigger download
+            window.open('/downloads/KashiAI_Premium_Setup.exe', '_blank');
+            
+            // Show instructions
+            window.kashiAI.addMessage(
+                "Download started! After installation, use your login credentials to access premium features.", 
+                'ai'
+            );
+        }
+
+        // Helper function for support contact
+        function contactSupport(paymentId) {
+            const supportMessage = `I need help with my premium purchase. Payment ID: ${paymentId}`;
+            const supportEmail = 'support@kashiai.com';
+            const mailtoLink = `mailto:${supportEmail}?subject=Premium Purchase Issue&body=${encodeURIComponent(supportMessage)}`;
+            
+            window.open(mailtoLink);
+            
+            window.kashiAI.addMessage(
+                "Support email opened. Please describe your issue and include the payment ID.", 
+                'ai'
+            );
+        }
+
+
+        function showHelp() {
+            const helpMessage = `
+                <div class="message ai-message">
+                    <div class="message-sender">Kashi AI - Help</div>
+                    <div>
+                        <strong>Available Commands:</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li><strong>generate image [description]</strong> - Create AI-generated images</li>
+                            <li><strong>open [website/app]</strong> - Launch applications or websites</li>
+                            <li><strong>analyze image</strong> - Upload and analyze images</li>
+                            <li><strong>weather</strong> - Get current weather information</li>
+                            <li><strong>time</strong> - Get current time</li>
+                            <li><strong>news</strong> - Get latest news headlines</li>
+                            <li><strong>remember [fact]</strong> - Store information for later</li>
+                            <li><strong>forget [fact]</strong> - Remove stored information</li>
+                        </ul>
+                        <strong>Features:</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>🎤 Click microphone for voice input</li>
+                            <li>📁 Upload images and documents for analysis</li>
+                            <li>💬 Natural conversation with AI</li>
+                            <li>🔍 Real-time web search capabilities</li>
+                            <li>🎨 AI image generation</li>
+                            <li>💾 Persistent chat history</li>
+                            <li>🔊 Text-to-speech responses</li>
+                        </ul>
+                        <strong>Tips:</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>Use natural language - I understand context</li>
+                            <li>Ask follow-up questions for more details</li>
+                            <li>Try voice input for hands-free interaction</li>
+                            <li>Upload images for analysis and description</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            document.getElementById('chatMessages').innerHTML += helpMessage;
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        }
+
+        // Initialize voices when they become available
+        function initializeVoices() {
+            if (window.speechSynthesis) {
+                // Wait for voices to be loaded
+                const loadVoices = () => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        console.log('Available voices:', voices.map(v => v.name));
+                    } else {
+                        setTimeout(loadVoices, 100);
+                    }
+                };
+                
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = loadVoices;
+                } else {
+                    loadVoices();
+                }
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            window.kashiAI = new KashiAIWebApp();
+            initializeVoices();
+        });
+
+        // Handle page visibility changes to pause/resume speech
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && window.speechSynthesis) {
+                window.speechSynthesis.pause();
+            } else if (!document.hidden && window.speechSynthesis) {
+                window.speechSynthesis.resume();
+            }
+        });
+
+        // Handle beforeunload to clean up speech
+        window.addEventListener('beforeunload', () => {
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+        });
+    </script>
+</body>
+</html>
